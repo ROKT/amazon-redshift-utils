@@ -40,9 +40,10 @@ select
     decode(m.blocks_to_disk, -1, null, m.blocks_to_disk)                                  spill_mb,
     m2.rows                                                                            as ret_rows,
     m3.rows                                                                            as NL_rows,
-    substring(replace(nvl(qrytext_cur.text,
-                          trim(translate(s.text, chr(10) || chr(13) || chr(9), ''))), '\\n',
-                      ' '), 1, 1023)                                                    as sql,
+    qrytext_cur.text,
+--     substring(replace(nvl(qrytext_cur.text,
+--                           trim(translate(s.text, chr(10) || chr(13) || chr(9), ''))), '\\n',
+--                       ' '), 1, 1023)                                                    as sql,
     trim(decode(event & 1, 1, 'SK ', '') || decode(event & 2, 2, 'Del ', '') ||
          decode(event & 4, 4, 'NL ', '') || decode(event & 8, 8, 'Dist ', '') ||
          decode(event & 16, 16, 'Bcast ', '') || decode(event & 32, 32, 'Stats ', '')) as Alert

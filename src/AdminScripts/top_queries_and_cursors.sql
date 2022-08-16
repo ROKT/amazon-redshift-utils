@@ -28,7 +28,8 @@ select
     starttime::date as date,
     u.usename,
     count(query)                                                                          as n_qry,
-    max(substring(qrytext, 1, 512))                                                       as qrytext,
+    max(substring(qrytext, 1, 2048))                                                       as qrytext,
+--     qrytext,
     max(run_seconds)                                                                      as "max",
     avg(run_seconds)                                                                      as "avg",
     sum(run_seconds)                                                                      as total,
@@ -81,8 +82,6 @@ from
                                                 0)) as event
                                  from
                                      STL_ALERT_EVENT_LOG
-                                 where
-                                     event_time >= dateadd(day, -10, current_Date)
                                  group by query) as alrt
                     on alrt.query = q.query
                 LEFT OUTER JOIN (SELECT
@@ -102,13 +101,10 @@ from
 -- and q.querytxt ilike 'COPY%'  
 -- and q.database = ''
 -- and q.aborted = 1
-          and q.starttime >= dateadd(day, -10, current_Date)
     ) as qqaqc
         left outer join pg_user u on (qqaqc.userid = u.usesysid)
 group by
-    date, u.usename, qry_md5, aborted, event
-having
-    date >= '2022-04-27'
+    date, u.usename, qry_md5, aborted, event, qrytext
 order by
     total desc
 limit 10000;
